@@ -1,9 +1,11 @@
 ﻿@page "/add-country"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Client.Services
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>AddCountry</h3>
 
@@ -59,6 +61,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/countries-list");
+        navigation.NavigateTo("/countries-list", forceLoad: true);
     }
 }

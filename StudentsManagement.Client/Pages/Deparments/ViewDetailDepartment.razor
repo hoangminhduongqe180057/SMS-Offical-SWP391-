@@ -1,7 +1,9 @@
-﻿@page "/department/delete/{id:int}"
+﻿@page "/department/detail/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Delete Department Detail</h3>
 
@@ -28,8 +30,8 @@
         </table>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary" @onclick="Delete">Delete Department</button>
-        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Cancel</button>
+        <a class="btn btn-success" href="/department/edit/@departmentobj.Id"> Update Department </a>
+        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
     </div>
 </div>
 
@@ -53,11 +55,11 @@
     protected async Task Delete()
     {
         var result = await DepartmentService.DeleteAsync(id);
-        navigation.NavigateTo("/departments-list");
+        navigation.NavigateTo("/departments-list", forceLoad: true);
     }
 
     public void Cancel()
     {
-        navigation.NavigateTo("/departments-list");
+        navigation.NavigateTo("/departments-list", forceLoad: true);
     }
 }

@@ -1,7 +1,9 @@
-﻿@page "/systemCode/delete/{id:int}"
+﻿@page "/systemCode/detail/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Delete System Code</h3>
 
@@ -20,8 +22,8 @@
         </table>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary" @onclick="Delete">Delete System Code</button>
-        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Cancel</button>
+        <a class="btn btn-success" href="/systemCode/edit/@systemCodeObj.Id"> Update System Code </a>
+        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
     </div>
 </div>
 
@@ -45,11 +47,11 @@
     protected async Task Delete()
     {
         var result = await SystemCodeService.DeleteAsync(id);
-        navigation.NavigateTo("/systemCodes-list");
+        navigation.NavigateTo("/systemCodes-list", forceLoad: true);
     }
 
     public void Cancel()
     {
-        navigation.NavigateTo("/systemCodes-list");
+        navigation.NavigateTo("/systemCodes-list", forceLoad: true);
     }
 }

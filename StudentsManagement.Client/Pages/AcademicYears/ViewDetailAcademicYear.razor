@@ -1,7 +1,9 @@
-﻿@page "/academicYear/delete/{id:int}"
+﻿@page "/academicYear/detail/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 @inject IJSRuntime JSRuntime
 
 <h3>Delete Academic Year</h3>
@@ -24,13 +26,13 @@
             </tr>
             <tr>
                 <th>Status</th>
-                <td>@academicobj.Status?.Description</td>
+                <td>@academicobj.Status</td>
             </tr>
         </table>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary" @onclick="Delete">Delete Academic Year</button>
-        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Cancel</button>
+        <a class="btn btn-success" href="/academicYear/edit/@academicobj.Id"> Update Academic Year </a>
+        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
     </div>
 </div>
 
@@ -54,11 +56,11 @@
     protected async Task Delete()
     {
         var result = await AcademicYearService.DeleteAsync(id);
-        navigation.NavigateTo("/academicYears-list");
+        navigation.NavigateTo("/academicYears-list", forceLoad: true);
     }
 
     public void Cancel()
     {
-        navigation.NavigateTo("/academicYears-list");
+        navigation.NavigateTo("/academicYears-list", forceLoad: true);
     }
 }

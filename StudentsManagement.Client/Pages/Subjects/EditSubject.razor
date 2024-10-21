@@ -1,8 +1,10 @@
 ﻿@page "/subject/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JsRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -73,7 +75,8 @@
         try
         {
             var result = SubjectService.UpdateAsync(subjectobj);
-            navigation.NavigateTo("/subjects-list");
+            StateHasChanged();
+            navigation.NavigateTo("/subjects-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -83,6 +86,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/subjects-list");
+        navigation.NavigateTo("/subjects-list", forceLoad: true);
     }
 }

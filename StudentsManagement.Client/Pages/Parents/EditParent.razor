@@ -1,8 +1,10 @@
 ﻿@page "/parent/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Update Parent Detail</h3>
 
@@ -145,7 +147,7 @@
         try
         {
             var result = await ParentService.UpdateAsync(parentobj);
-            navigation.NavigateTo("/parents-list");
+            navigation.NavigateTo("/parents-list", forceLoad: true);
         }
         catch(Exception ex)
         {
@@ -155,6 +157,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/parents-list");
+        navigation.NavigateTo("/parents-list", forceLoad: true);
     }
 }

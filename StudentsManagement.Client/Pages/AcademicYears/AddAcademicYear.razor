@@ -1,8 +1,10 @@
 ﻿@page "/add-academicYear"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -74,7 +76,7 @@
         try
         {
             var result = AcademicYearService.AddAsync(academicobj);
-            navigation.NavigateTo("/academicYears-list");
+            navigation.NavigateTo("/academicYears-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -83,6 +85,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/academicYears-list");
+        navigation.NavigateTo("/academicYears-list", forceLoad: true);
     }
 }

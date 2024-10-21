@@ -1,9 +1,11 @@
 ﻿@page "/teacher/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @using StudentsManagement.Client.Services
 @inject NavigationManager navigation;
 @inject IJSRuntime JsRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -173,7 +175,7 @@
         try
         {
             var result = await TeacherService.UpdateAsync(teachobj);
-            navigation.NavigateTo("/teachers-list");
+            navigation.NavigateTo("/teachers-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -182,6 +184,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/teachers-list");
+        navigation.NavigateTo("/teachers-list", forceLoad: true);
     }
 }

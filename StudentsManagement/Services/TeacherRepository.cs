@@ -27,7 +27,7 @@ namespace StudentsManagement.Services
             if (data == null) return null;
             _context.Teachers.Remove(data);
             await _context.SaveChangesAsync();
-            return data;    
+            return data;
 
         }
 
@@ -53,5 +53,25 @@ namespace StudentsManagement.Services
 
             return data;
         }
+
+        public async Task<PaginationModel<Teacher>> GetPagedTeachersAsync(int pageNumber, int pageSize)
+        {
+            var totalItems = await _context.Teachers.CountAsync();  
+            var teachers = await _context.Teachers
+                .Include(s => s.Gender)
+                .Include(x => x.MaritalStatus)
+                .Skip((pageNumber - 1) * pageSize)  
+                .Take(pageSize)            
+                .ToListAsync();
+
+            return new PaginationModel<Teacher>
+            {
+                Items = teachers,
+                TotalItems = totalItems,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
+
     }
 }

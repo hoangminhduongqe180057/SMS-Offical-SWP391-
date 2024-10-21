@@ -1,7 +1,9 @@
-﻿@page "/bookIssuance/delete/{id:int}"
+﻿@page "/bookIssuance/detail/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Delete Book Issuance Detail</h3>
 
@@ -16,10 +18,6 @@
             <tr>
                 <th>Due Date</th>
                 <td>@bookobj.DueDate</td>
-            </tr>
-            <tr>
-                <th>Return Date</th>
-                <td>@bookobj.ReturnDate</td>
             </tr>
             <tr>
                 <th>Class Name</th>
@@ -44,8 +42,8 @@
         </table>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary" @onclick="Delete">Delete Book Issuance</button>
-        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Cancel</button>
+        <a class="btn btn-success" href="/bookIssuance/edit/@bookobj.Id"> Update Book Issuance </a>
+        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
     </div>
 </div>
 
@@ -69,11 +67,11 @@
     protected async Task Delete()
     {
         var result = await BookIssuanceService.DeleteAsync(id);
-        navigation.NavigateTo("/returnedBooks-list");
+        navigation.NavigateTo("/returnedBooks-list", forceLoad: true);
     }
 
     public void Cancel()
     {
-        navigation.NavigateTo("/returnedBooks-list");
+        navigation.NavigateTo("/bookIssuances-list", forceLoad: true);
     }
 }

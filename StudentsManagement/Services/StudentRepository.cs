@@ -62,5 +62,25 @@ namespace StudentsManagement.Services
 
             return newstudent;
         }
+
+
+        public async Task<PaginationModel<Student>> GetPagedStudentsAsync(int pageNumber, int pageSize)
+        {
+            var totalItems = await _context.Students.CountAsync(); 
+            var students = await _context.Students
+                .Include(s => s.Gender)    
+                .Include(s => s.Country)   
+                .Skip((pageNumber - 1) * pageSize) 
+                .Take(pageSize)            
+                .ToListAsync();
+
+            return new PaginationModel<Student>
+            {
+                Items = students,
+                TotalItems = totalItems,
+                CurrentPage = pageNumber,
+                PageSize = pageSize
+            };
+        }
     }
 }

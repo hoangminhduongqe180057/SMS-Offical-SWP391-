@@ -14,5 +14,7 @@ namespace StudentsManagement.Shared.StudentRepository
         Task<Student> DeleteStudentAsync(int studentId);
         Task<Student> GetStudentByIdAsync(int studentId);
         Task<List<Student>> GetAllStudentsAsync();
+        Task<PaginationModel<Student>> GetPagedStudentsAsync(int pageNumber, int pageSize);
+
     }
 }

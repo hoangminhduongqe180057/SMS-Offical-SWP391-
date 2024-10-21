@@ -1,8 +1,10 @@
 ﻿@page "/academicYear/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Update Academic Year</h3>
 
@@ -75,7 +77,7 @@
         try
         {
             var result = await AcademicYearService.UpdateAsync(academicobj);
-            navigation.NavigateTo("/academicYears-list");
+            navigation.NavigateTo("/academicYears-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -85,6 +87,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/academicYears-list");
+        navigation.NavigateTo("/academicYears-list", forceLoad: true);
     }
 }

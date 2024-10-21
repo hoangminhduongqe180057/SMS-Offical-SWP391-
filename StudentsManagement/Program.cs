@@ -12,6 +12,9 @@ using StudentsManagement.Services;
 using StudentsManagement.Shared.StudentRepository;
 using StudentsManagement.Controllers;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using StudentsManagement.Utilities;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,24 +29,34 @@ builder.Services.AddScoped<IdentityUserAccessor>();
 builder.Services.AddScoped<IdentityRedirectManager>();
 builder.Services.AddScoped<AuthenticationStateProvider, PersistingRevalidatingAuthenticationStateProvider>();
 
-builder.Services.AddControllers(); // Thêm dịch vụ cho Controller
+builder.Services.AddControllers();
 
-//builder.Services.AddAuthentication(options =>
-//{
-//    options.DefaultScheme = IdentityConstants.ApplicationScheme;
-//    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-//})
-//    .AddIdentityCookies();
+builder.Services.AddServerSideBlazor()
+    .AddCircuitOptions(options =>
+    {
+        options.DetailedErrors = false;
+    })
+    .AddHubOptions(options =>
+    {
+        options.ClientTimeoutInterval = TimeSpan.FromMinutes(2);  // Thời gian chờ để giữ kết nối
+        options.HandshakeTimeout = TimeSpan.FromSeconds(30);      // Thời gian chờ để bắt tay kết nối ban đầu
+        options.KeepAliveInterval = TimeSpan.FromMinutes(1);      // Thời gian giữ kết nối
+    });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
+
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 1024 * 1024 * 15; // Max 15MB
+});
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
@@ -58,12 +71,22 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IBookIssuanceRepository, BookIssuanceRepository>();
 builder.Services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
+builder.Services.AddScoped<IPaginationRepository, PaginationRepository>();
 builder.Services.AddScoped<SystemCodeDetailService>();
+builder.Services.AddScoped<SystemCodeDetailRepository>();
+builder.Services.AddScoped<UserRepository>();
+
+
+builder.Services.AddTransient<IEmailSender, AuthMessageSender>(); // send Email
+
+// Đăng ký RoleManager
+builder.Services.AddScoped<RoleManager<ApplicationRole>>();
 
 builder.Services.AddScoped(http => new HttpClient
 {
     BaseAddress = new Uri(builder.Configuration.GetSection("BaseAddress").Value!)
 });
+
 
 builder.Services.Configure<CookiePolicyOptions>(options =>
 {
@@ -78,7 +101,15 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.Configure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, x => x.Cookie.SameSite = SameSiteMode.None);
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 builder.Services.AddAuthentication();
 builder.Services.AddApiAuthorization();
@@ -111,17 +142,20 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseHttpsRedirection();
-app.UseStaticFiles();
 app.UseCookiePolicy();
 app.UseStaticFiles();
 app.UseAntiforgery();
-app.UseCors();
+
+app.UseCors("AllowAll");
+
+
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
     .AddInteractiveWebAssemblyRenderMode()
     .AddAdditionalAssemblies(typeof(Counter).Assembly);
 
 app.MapControllers();
+//app.MapBlazorHub();
 
 // Add additional endpoints required by the Identity /Account Razor components.
 app.MapAdditionalIdentityEndpoints();

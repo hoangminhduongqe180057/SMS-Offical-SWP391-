@@ -10,5 +10,6 @@ namespace StudentsManagement.Client.Repository
         Task<SystemCodeDetail> GetByIdAsync(int countryId);
         Task<List<SystemCodeDetail>> GetAllAsync();
         Task<List<SystemCodeDetail>> GetByCodeAsync(string code);
+        Task<PaginationModel<SystemCodeDetail>> GetPagedSystemCodeDetailsAsync(int pageNumber, int pageSize);
     }
 }

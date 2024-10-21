@@ -1,9 +1,11 @@
 ﻿@page "/systemCode/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Client.Services
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Update System Code</h3>
 
@@ -32,7 +34,7 @@
                     </div>
                 </div>
                 <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">Update System Code</button>
+                    <button type="submit" class="btn btn-primary">Save System Code</button>
                     <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
                 </div>
             </div>
@@ -62,7 +64,7 @@
         try
         {
             var rs = await SystemCodeService.UpdateAsync(systemCodeObj);
-            navigation.NavigateTo("/systemCodes-list");
+            navigation.NavigateTo("/systemCodes-list", forceLoad: true);
         }
         catch(Exception ex)
         {
@@ -72,6 +74,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/systemCodes-list");
+        navigation.NavigateTo("/systemCodes-list", forceLoad: true);
     }
 }

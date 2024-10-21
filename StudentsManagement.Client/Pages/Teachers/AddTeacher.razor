@@ -1,8 +1,10 @@
 ﻿@page "/add-teacher"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -168,7 +170,7 @@
         try
         {
             var result = await TeacherService.AddAsync(teachobj);
-            navigation.NavigateTo("/teachers-list");
+            navigation.NavigateTo("/teachers-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -177,6 +179,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/teachers-list");
+        navigation.NavigateTo("/teachers-list", forceLoad: true);
     }
 }

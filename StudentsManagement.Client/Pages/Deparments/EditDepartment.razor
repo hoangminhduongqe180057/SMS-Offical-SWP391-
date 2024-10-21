@@ -1,8 +1,10 @@
 ﻿@page "/department/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JsRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -73,7 +75,7 @@
         try
         {
             var result = DepartmentService.UpdateAsync(departmentobj);
-            navigation.NavigateTo("/departments-list");
+            navigation.NavigateTo("/departments-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -83,6 +85,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/departments-list");
+        navigation.NavigateTo("/departments-list", forceLoad: true);
     }
 }

@@ -1,8 +1,10 @@
 ﻿@page "/book/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Update Book Detail</h3>
 
@@ -60,7 +62,7 @@
                     </div>
                 </div>
                 <div class="form-group mt-4">
-                    <button type="submit" class="btn btn-primary">Update Book</button>
+                    <button type="submit" class="btn btn-primary">Save Book</button>
                     <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
                 </div>
             </div>
@@ -92,7 +94,7 @@
         try
         {
             var result = await BookService.UpdateAsync(bookobj);
-            navigation.NavigateTo("/books-list");
+            navigation.NavigateTo("/books-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -102,7 +104,7 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/books-list");
+        navigation.NavigateTo("/books-list", forceLoad: true);
     }
 
     // Phương thức tăng số lượng

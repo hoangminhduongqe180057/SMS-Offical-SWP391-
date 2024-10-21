@@ -1,8 +1,10 @@
 ﻿@page "/add-parent"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -143,7 +145,7 @@
         try
         {
             var result = await ParentService.AddAsync(parentobj);
-            navigation.NavigateTo("/parents-list");
+            navigation.NavigateTo("/parents-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -152,6 +154,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/parents-list");
+        navigation.NavigateTo("/parents-list", forceLoad: true);
     }
 }

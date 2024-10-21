@@ -1,8 +1,10 @@
 ﻿@page "/returnBook/edit/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Return Book</h3>
 
@@ -136,7 +138,7 @@
         try
         {
             var result = await BookIssuanceService.ReturnBookUpdateAsync(bookobj);
-            navigation.NavigateTo("/bookIssuances-list");
+            navigation.NavigateTo("/bookIssuances-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -146,6 +148,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/bookIssuances-list");
+        navigation.NavigateTo("/bookIssuances-list", forceLoad: true);
     }
 }

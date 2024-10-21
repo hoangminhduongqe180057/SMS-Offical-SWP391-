@@ -9,5 +9,6 @@ namespace StudentsManagement.Client.Repository
         Task<Teacher> DeleteAsync(int teacherId);
         Task<Teacher> GetByIdAsync(int teacherId);
         Task<List<Teacher>> GetAllAsync();
+        Task<PaginationModel<Teacher>> GetPagedTeachersAsync(int pageNumber, int pageSize);
     }
 }

@@ -1,7 +1,11 @@
 ﻿@page "/subjects-list"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JsRuntime
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -14,11 +18,15 @@
                     <div class="col-md-12">
                         <div class="card">
                             <div class="card-header"></div>
-                            @if (!AllSubjects.Any())
+                            @if (subjects == null)
                             {
                                 <p><em>Loading Subjects...</em></p>
                             }
-                            @if (AllSubjects.Any())
+                            else if (!subjects.Items.Any())
+                            {
+                                <div class="alert alert-info"> There is no Subject List Available</div>
+                            }
+                            else
                             {
                                 <div class="card-body">
                                     <table class="table table-striped table-hover">
@@ -29,12 +37,13 @@
                                                 <th>Subject Description</th>
                                                 <th>Created By</th>
                                                 <th>Created On</th>
+                                                <th>View</th>
                                                 <th>Edit</th>
                                                 <th>Delete</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach (var subject in AllSubjects)
+                                            @foreach (var subject in subjects.Items)
                                             {
                                                 <tr>
                                                     <td>@subject.Id</td>
@@ -43,20 +52,25 @@
                                                     <td>@subject.CreatedById</td>
                                                     <td>@subject.CreatedOn.ToShortDateString()</td>
                                                     <td>
+                                                        <a class="btn btn-primary" href="/subject/detail/@subject.Id"> View </a>
+                                                    </td>
+                                                    <td>
                                                         <a class="btn btn-success" href="/subject/edit/@subject.Id"> Edit </a>
                                                     </td>
                                                     <td>
-                                                        <a class="btn btn-danger" href="/subject/delete/@subject.Id"> Delete </a>
+                                                        <a class="btn btn-danger" @onclick="() => DeleteSubject(subject.Id)"> Delete </a>
                                                     </td>
                                                 </tr>
                                             }
                                         </tbody>
                                     </table>
+                                    <!-- Pagination Controls -->
+                                    <div class="button-group mt-3">
+                                        <button class="btn btn-custom" @onclick="PreviousPage" style="@GetButtonStyle(!CanGoToPreviousPage)">Previous</button>
+                                        <button class="btn btn-custom ms-2" @onclick="NextPage" style="@GetButtonStyle(!CanGoToNextPage)">Next</button>
+                                    </div>
+                                    <p class="mt-2">Page @subjects.CurrentPage of @subjects.TotalPages</p>
                                 </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-info"> There is no Subjects List Availlable</div>
                             }
                         </div>
                     </div>
@@ -67,22 +81,57 @@
 </div>
 
 @code {
-    public List<Subject> AllSubjects { get; set; } = new();
-
-    public Subject subject = new Subject();
+    private PaginationModel<Subject>? subjects;
+    private int currentPage = 1;
+    private int pageSize = 10;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadAllSubjects();
+        await LoadPagedSubjects(currentPage);
     }
-    public async Task LoadAllSubjects()
+
+    private async Task LoadPagedSubjects(int page)
     {
-        var data = await SubjectService.GetAllAsync();
+        subjects = await SubjectService.GetPagedSubjectsAsync(page, pageSize);
+    }
 
-        if (data is null) return;
+    private async Task NextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+            await LoadPagedSubjects(currentPage);
+        }
+    }
 
-        AllSubjects.Clear();
+    private async Task PreviousPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+            await LoadPagedSubjects(currentPage);
+        }
+    }
 
-        AllSubjects.AddRange(data);
+    private string GetButtonStyle(bool isInactive)
+    {
+        return isInactive ? "opacity: 0.6; pointer-events: none;" : "";
+    }
+
+    private bool CanGoToPreviousPage => subjects?.CurrentPage > 1;
+    private bool CanGoToNextPage => subjects?.CurrentPage < subjects?.TotalPages;
+
+    private async Task DeleteSubject(int id)
+    {
+        bool confirm = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete?");
+        if (confirm)
+        {
+            var subject = await SubjectService.DeleteAsync(id);
+            bool result = subject != null;
+            if (result)
+            {
+                await LoadPagedSubjects(currentPage);
+            }
+        }
     }
 }

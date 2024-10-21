@@ -1,8 +1,10 @@
 ﻿@page "/add-bookIssuance"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -123,7 +125,7 @@
         try
         {
             var result = BookIssuanceService.AddAsync(bookobj);
-            navigation.NavigateTo("/bookIssuances-list");
+            navigation.NavigateTo("/bookIssuances-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -132,6 +134,6 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/bookIssuances-list");
+        navigation.NavigateTo("/bookIssuances-list", forceLoad: true);
     }
 }

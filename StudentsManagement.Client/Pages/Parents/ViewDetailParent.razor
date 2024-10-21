@@ -1,7 +1,9 @@
-﻿@page "/parent/delete/{id:int}"
+﻿@page "/parent/detail/{id:int}"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Delete Parent Detail</h3>
 
@@ -44,8 +46,8 @@
         </table>
     </div>
     <div class="form-group">
-        <button type="submit" class="btn btn-primary" @onclick="Delete">Delete Student</button>
-        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Cancel</button>
+        <a class="btn btn-success" href="/parent/edit/@parentobj.Id"> Update Parent </a>
+        <button type="button" @onclick="()=>Cancel()" class="btn btn-danger">Back to list</button>
     </div>
 </div>
 
@@ -69,11 +71,11 @@
     protected async Task Delete()
     {
         var result = await ParentService.DeleteAsync(id);
-        navigation.NavigateTo("/parents-list");
+        navigation.NavigateTo("/parents-list", forceLoad: true);
     }
 
     public void Cancel()
     {
-        navigation.NavigateTo("/parents-list");
+        navigation.NavigateTo("/parents-list", forceLoad: true);
     }
 }

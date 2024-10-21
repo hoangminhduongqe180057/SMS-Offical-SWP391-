@@ -45,5 +45,12 @@ namespace StudentsManagement.Client.Services
             var respone = await newparent.Content.ReadFromJsonAsync<Parent>();
             return respone;
         }
+
+        public async Task<PaginationModel<Parent>> GetPagedParentsAsync(int pageNumber, int pageSize)
+        {
+            var response = await _httpClient.GetFromJsonAsync<PaginationModel<Parent>>(
+                $"api/parent?pageNumber={pageNumber}&pageSize={pageSize}");
+            return response;
+        }
     }
 }

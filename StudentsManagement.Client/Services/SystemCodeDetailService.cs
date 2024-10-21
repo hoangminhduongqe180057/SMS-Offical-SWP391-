@@ -59,5 +59,12 @@ namespace StudentsManagement.Client.Services
             return response;
         }
 
+        public async Task<PaginationModel<SystemCodeDetail>> GetPagedSystemCodeDetailsAsync(int pageNumber, int pageSize)
+        {
+            var response = await _httpClient.GetFromJsonAsync<PaginationModel<SystemCodeDetail>>(
+                $"api/systemCodeDetail?pageNumber={pageNumber}&pageSize={pageSize}");
+            return response;
+        }
+
     }
 }

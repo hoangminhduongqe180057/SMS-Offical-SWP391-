@@ -1,9 +1,11 @@
 ﻿@page "/add-systemCode"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Client.Services
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <h3>Add New System Code</h3>
 
@@ -49,7 +51,7 @@
         try
         {
             var rs = await SystemCodeService.AddAsync(systemCodeObj);
-            navigation.NavigateTo("/systemCodes-list");
+            navigation.NavigateTo("/systemCodes-list", forceLoad: true);
         }
         catch(Exception ex)
         {
@@ -59,6 +61,6 @@
 
     public void Cancel()
     {
-        navigation.NavigateTo("/systemCodes-list");
+        navigation.NavigateTo("/systemCodes-list", forceLoad: true);
     }
 }

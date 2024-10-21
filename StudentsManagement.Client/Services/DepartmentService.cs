@@ -45,5 +45,12 @@ namespace StudentsManagement.Client.Services
             var respone = await data.Content.ReadFromJsonAsync<Department>();
             return respone;
         }
+
+        public async Task<PaginationModel<Department>> GetPagedDepartmentsAsync(int pageNumber, int pageSize)
+        {
+            var response = await _httpClient.GetFromJsonAsync<PaginationModel<Department>>(
+                $"api/department?pageNumber={pageNumber}&pageSize={pageSize}");
+            return response;
+        }
     }
 }

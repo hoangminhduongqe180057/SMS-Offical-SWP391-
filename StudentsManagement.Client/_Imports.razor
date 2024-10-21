@@ -11,6 +11,7 @@
 @using StudentsManagement.Client.Repository
 @using StudentsManagement.Client.Services
 @using StudentsManagement.Shared.StudentRepository
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject IStudentRepository StudentService
 @inject ICountryRepository CountryService
@@ -23,3 +24,4 @@
 @inject IDepartmentRepository DepartmentService
 @inject IBookIssuanceRepository BookIssuanceService
 @inject IAcademicYearRepository AcademicYearService
+@inject IPaginationRepository PaginationService

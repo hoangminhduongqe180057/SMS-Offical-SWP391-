@@ -1,8 +1,10 @@
 ﻿@page "/add-book"
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
 @using StudentsManagement.Shared.Models
 @inject NavigationManager navigation;
 @inject IJSRuntime JSRuntime
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="row">
     <div class="col-12">
@@ -84,7 +86,7 @@
         try
         {
             var result = BookService.AddAsync(bookobj);
-            navigation.NavigateTo("/books-list");
+            navigation.NavigateTo("/books-list", forceLoad: true);
         }
         catch (Exception ex)
         {
@@ -93,7 +95,7 @@
     }
     public void Cancel()
     {
-        navigation.NavigateTo("/books-list");
+        navigation.NavigateTo("/books-list", forceLoad: true);
     }
     // Phương thức tăng số lượng
     private void IncrementCopies()
